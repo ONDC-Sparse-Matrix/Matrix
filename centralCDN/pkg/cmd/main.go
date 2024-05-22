@@ -54,6 +54,34 @@ func main() {
 		return c.SendString(body)
 	})
 
+	app.Post("/cache/:clientId",func(c *fiber.Ctx) error{
+		clientId = c.Params("clientId")
+		var cacheResponse string
+		var clientCacheResponse string
+
+		if err := c.BodyParser(&cacheResponse); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+		}
+
+		if err := c.BodyParser(&clientCacheResponse); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+		}
+
+		//TODO: @DAGGER store the cacheResponse in the cache
+
+		//TODO: @Wayne store the clientCacheResponse in a Queue 
+
+	})
+
+	app.Get("/sse/:clientId", func(c *fiber.Ctx) error {
+		clientId := c.Params("clientId")
+		c.Set("Content-Type", "text/event-stream")
+		c.Set("Connection", "keep-alive")
+
+		//TODO: @Wayne get the clientCacheResponse from the Queue
+		//TODO: @Wayne send the clientCacheResponse to the client
+	})
+
 	// type MerchantAddRequestBody struct {
 	// 	Pincode      string   `json:"pincode"`
 	// 	MerchantList []string `json:"merchantList"`
