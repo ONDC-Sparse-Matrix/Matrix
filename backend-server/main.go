@@ -11,7 +11,7 @@ func main() {
 	app := fiber.New()
 
 	configs.ConnectDB()
-
+	
 	routes.MerchantRouter(app)
 	routes.MapRouter(app)
 
