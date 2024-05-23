@@ -1,10 +1,17 @@
 import "./App.css";
-import { Button } from "@/components/ui/button";
+import Home from "@/pages/home";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
     <>
-      <Button>Hello</Button>
+      <Router>
+        <Routes>
+          <Route>
+            <Route path="/" element={<Home />} />
+          </Route>
+        </Routes>
+      </Router>
     </>
   );
 }
