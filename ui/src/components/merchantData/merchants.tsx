@@ -11,6 +11,7 @@ import { testPincodeData } from "@/lib/test-data";
 
 interface MerchantsProps {
   pincode: number;
+  sessionId: string;
 }
 
 export function Merchants(props: MerchantsProps) {
@@ -22,9 +23,12 @@ export function Merchants(props: MerchantsProps) {
   const getMerchantData = async (pincode: string) => {
     setIsLoading(true);
     let start = performance.now();
+
     //* Uncomment this to fetch data from backend.
     // axios
-    //   .get<PincodeData>(`${FETCH_PINCODE_DATA}/${pincode}`)
+    //   .post<PincodeData>(`${FETCH_PINCODE_DATA}/${pincode}`, {
+    //     session: props.sessionId,
+    //   })
     //   .then((res) => setData(res.data));
 
     //* Test data here

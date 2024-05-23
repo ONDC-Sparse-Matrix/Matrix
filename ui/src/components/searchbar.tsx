@@ -2,6 +2,8 @@ import { Input } from "./ui/input";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSessionStore } from "@/lib/session-store";
+import { generateRandomId } from "@/lib/utils";
 
 interface SearchBarProps {
   pincode?: string;
@@ -9,18 +11,18 @@ interface SearchBarProps {
 
 export function SearchBar(props: SearchBarProps) {
   const [searchedPincode, setSearchedPincode] = useState("");
+  const { sessionId, setSessionId } = useSessionStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate(`/search?pincode=${searchedPincode}`);
-
-    // TODO : Uncomment for performance metrics
-    // let start = performance.now();
-    // let currentMerchantList = await fetchAndCachePincodeData();
-    // setMerchantData(currentMerchantList);
-    // let end = performance.now();
-    // setTimeTakenForRequest(end - start);
+    if (sessionId) {
+      navigate(`/search?session=${sessionId}&pincode=${searchedPincode}`);
+    } else {
+      const newSessionId = generateRandomId(5);
+      navigate(`/search?session=${newSessionId}&pincode=${searchedPincode}`);
+      setSessionId(newSessionId);
+    }
   };
 
   return (
