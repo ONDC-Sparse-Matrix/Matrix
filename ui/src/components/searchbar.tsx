@@ -1,0 +1,48 @@
+import { Input } from "./ui/input";
+import { Search } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface SearchBarProps {
+  pincode?: string;
+}
+
+export function SearchBar(props: SearchBarProps) {
+  const [searchedPincode, setSearchedPincode] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    navigate(`/search?pincode=${searchedPincode}`);
+
+    // TODO : Uncomment for performance metrics
+    // let start = performance.now();
+    // let currentMerchantList = await fetchAndCachePincodeData();
+    // setMerchantData(currentMerchantList);
+    // let end = performance.now();
+    // setTimeTakenForRequest(end - start);
+  };
+
+  return (
+    <>
+      <div className="relative w-full mb-10">
+        <div className="max-w-xl mx-auto">
+          <div className="absolute inset-y-0 flex items-center ps-3 pointer-events-none">
+            <Search className="text-sm text-gray-400 dark:text-gray-600" />
+          </div>
+          <form onSubmit={handleSubmit}>
+            <Input
+              placeholder="Enter your pincode"
+              id="pincode"
+              type="number"
+              required
+              onChange={(e) => setSearchedPincode(e.target.value)}
+              defaultValue={props.pincode ? props.pincode : ""}
+              className="bg-sky-50 dark:bg-gray-800 transition-all duration-300 p-6 ps-12 text-md rounded-full"
+            />
+          </form>
+        </div>
+      </div>
+    </>
+  );
+}
