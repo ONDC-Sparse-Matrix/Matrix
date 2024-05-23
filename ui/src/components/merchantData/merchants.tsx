@@ -2,11 +2,11 @@ import { MerchantCard } from "./merchant-card";
 import { TimeData } from "./time-data";
 import { Spinner } from "@/components/ui/spinner";
 import { useEffect } from "react";
+import { useState } from "react";
+
 import axios from "axios";
 import { FETCH_PINCODE_DATA } from "@/lib/endpoints";
 import { PincodeData } from "@/lib/types";
-import { useState } from "react";
-
 import { testPincodeData } from "@/lib/test-data";
 
 interface MerchantsProps {
@@ -17,15 +17,15 @@ export function Merchants(props: MerchantsProps) {
   const [data, setData] = useState<PincodeData>();
   const [timeTakenForRequest, setTimeTakenForRequest] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // The main function
   const getMerchantData = async (pincode: string) => {
     setIsLoading(true);
     let start = performance.now();
     //* Uncomment this to fetch data from backend.
-    // setData(
-    //   await axios
-    //     .get<PincodeData>(`${FETCH_PINCODE_DATA}/${pincode}`)
-    //     .then((res) => res.data)
-    // );
+    // axios
+    //   .get<PincodeData>(`${FETCH_PINCODE_DATA}/${pincode}`)
+    //   .then((res) => setData(res.data));
 
     //* Test data here
     await new Promise((resolve) =>

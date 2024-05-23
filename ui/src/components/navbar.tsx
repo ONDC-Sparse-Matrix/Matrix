@@ -1,7 +1,7 @@
 "use-client";
 
 import { Button } from "./ui/button";
-import { Plus, Upload } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Tooltip,
@@ -9,8 +9,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-import { UploadCSV } from "./upload-csv";
 
 export function Navbar() {
   return (
@@ -29,7 +27,7 @@ export function Navbar() {
             <TooltipProvider>
               <ul className="p-4 md:p-0 mt-4 flex rounded-lg bg-gray-50 md:flex-row md:space-x-1 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
                 <li>
-                  <Link to="/addMerchant">
+                  <Link to="/add-merchant">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button variant={"link"}>
@@ -41,9 +39,6 @@ export function Navbar() {
                       </TooltipContent>
                     </Tooltip>
                   </Link>
-                </li>
-                <li>
-                  <UploadCSV />
                 </li>
               </ul>
             </TooltipProvider>
