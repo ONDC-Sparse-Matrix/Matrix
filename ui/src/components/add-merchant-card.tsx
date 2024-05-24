@@ -16,7 +16,7 @@ export function AddMerchantCard() {
   const uploadFile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return;
-    const socket = new  WebSocket("ws://localhost:3001/upload");
+    const socket = new  WebSocket("ws://localhost:3001/upload");//! central-server-url
 
     socket.onopen = () => {
       console.log("Connected to server");
