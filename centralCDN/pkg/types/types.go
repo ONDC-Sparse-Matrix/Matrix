@@ -16,3 +16,11 @@ type ServerRange struct {
 }
 
 var ServerRangeList []ServerRange
+
+// array of pincode vs frequency
+var FrequencyMap = make(map[int]int)
+
+var MinFreq int
+
+// Array of frequency vs pincode
+var Top50 = make(map[int][]int)

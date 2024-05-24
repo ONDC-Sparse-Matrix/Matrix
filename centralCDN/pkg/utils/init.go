@@ -16,6 +16,7 @@ func InitCacheServerList() {
 
 func InitPincode() {
 	types.PincodeCount = 30000
+	types.MinFreq = 0
 }
 
 func InitServerRangeList() {

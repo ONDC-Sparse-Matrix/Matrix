@@ -1,0 +1,48 @@
+- name: Build and run Docker container
+  hosts: host1
+  # gather_facts: true
+  become: yes
+  tasks:
+    - name: Check If Docker Is Installed
+      command: docker --version
+    
+    - name: Update the software package repository
+      pacman:
+        update_cache: yes
+
+    - name: Clone the Git repository
+      git:
+        repo: "https://github.com/ONDC-Sparse-Matrix/Sparse-Matrix-PS"
+        dest: "/home/death/Desktop/test/"
+        update: yes 
+     
+    # - name: Ensure Docker is installed
+    #   pacman:
+    #     name: docker
+    #     state: present
+    #     update_cache: no
+    #   ignore_errors: True
+    #   async: 30
+    #   poll: 30
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+   
+    - name: Move to repository directory
+      command: chdir=/home/death/Desktop/test/  ls
+
+    - name: Build Docker image
+      command: docker build -t frontend ./user-frontend
+
+    - name: Run Docker container
+      command: docker run -d --name Fronend_container frontend
+
+    - name: Ensure the Docker container is running
+      docker_container:
+        name: Fronend_container
+        image: frontend
+        state: started
