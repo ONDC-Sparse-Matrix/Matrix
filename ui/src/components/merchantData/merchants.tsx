@@ -6,8 +6,9 @@ import { useState } from "react";
 
 import axios from "axios";
 import { FETCH_PINCODE_DATA } from "@/lib/endpoints";
-import { PincodeData } from "@/lib/types";
-import { testPincodeData } from "@/lib/test-data";
+import { PincodeData, PincodeDataCache } from "@/lib/types";
+import { testPincodeData_1, testPincodeData_2 } from "@/lib/test-data";
+import { updateCache, searchCache } from "@/lib/db";
 
 interface MerchantsProps {
   pincode: number;
@@ -15,7 +16,10 @@ interface MerchantsProps {
 }
 
 export function Merchants(props: MerchantsProps) {
-  const [data, setData] = useState<PincodeData>();
+  const [data, setData] = useState<PincodeData["current"] | undefined>(
+    undefined
+  );
+  const [cache, setCache] = useState<PincodeDataCache | undefined>(undefined);
   const [timeTakenForRequest, setTimeTakenForRequest] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -34,13 +38,17 @@ export function Merchants(props: MerchantsProps) {
     //* Test data here
     await new Promise((resolve) =>
       setTimeout(() => {
-        setData(
-          pincode.toString() == testPincodeData.current.pincode
-            ? testPincodeData
-            : undefined
-        );
+        if (pincode.toString() == testPincodeData_1.current.pincode) {
+          setData(testPincodeData_1.current);
+          setCache(testPincodeData_1.cache);
+        } else if (pincode.toString() == testPincodeData_2.current.pincode) {
+          setData(testPincodeData_2.current);
+          setCache(testPincodeData_2.cache);
+        } else {
+          searchCache(pincode).then((res) => setData(res));
+        }
         resolve(void 0);
-      }, 3000)
+      }, 1000)
     );
 
     let end = performance.now();
@@ -49,8 +57,23 @@ export function Merchants(props: MerchantsProps) {
   };
 
   useEffect(() => {
-    getMerchantData(props.pincode.toString());
+    const func = async () => {
+      await getMerchantData(props.pincode.toString());
+    };
+    func();
+    console.log("pincode changed to: ", props.pincode.toString());
   }, [props.pincode]);
+
+  useEffect(() => {
+    const cacheData = async (cache: PincodeDataCache | undefined) => {
+      if (cache) {
+        console.log("Updating cache");
+        await updateCache(cache);
+        console.log("Cache updated");
+      }
+    };
+    cacheData(cache);
+  }, [cache]);
 
   return (
     <>
@@ -65,8 +88,8 @@ export function Merchants(props: MerchantsProps) {
             pincode={props.pincode}
             time={timeTakenForRequest}
           />
-          {data?.current.merchantList.map((merchant) => (
-            <MerchantCard {...merchant} />
+          {data?.merchantList.map((merchant, index) => (
+            <MerchantCard key={index} {...merchant} />
           ))}
         </>
       )}

@@ -3,10 +3,7 @@ export type PincodeData = {
     pincode: string;
     merchantList: MerchantData[];
   };
-  cache: {
-    pincode: string;
-    merchantList: MerchantData[];
-  }[];
+  cache: PincodeDataCache;
 };
 
 export type MerchantData = {
@@ -14,3 +11,8 @@ export type MerchantData = {
   email: string;
   pin_codes: string[];
 };
+
+export type PincodeDataCache = {
+  pincode: string;
+  merchantList: MerchantData[];
+}[];
