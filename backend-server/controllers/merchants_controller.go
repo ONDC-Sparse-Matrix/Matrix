@@ -53,7 +53,7 @@ func Send_SSE_Caching_responses (num float64,clientId string) {
 	for i :=num-float64(central_cache_range); i<num+float64(central_cache_range); i++{
 		var current_pincode_map models.Map
 		formattedString := strconv.FormatFloat(i, 'f', -1, 64)
-		err := mapCollection.FindOne(context.Background(), bson.M{"pin_code": formattedString}).Decode(&current_pincode_map)
+		err := mapCollection.FindOne(context.Background(), bson.M{"_id": formattedString}).Decode(&current_pincode_map)
 		if err != nil {
 			fmt.Println(i, "th Pincode data Not Found")
 			fmt.Println(err)
