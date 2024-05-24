@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Upload } from "lucide-react";
 import { useState } from "react";
+import * as XLSX from 'xlsx';
 
 export function AddMerchantCard() {
   const [email, setEmail] = useState("");
@@ -15,7 +16,56 @@ export function AddMerchantCard() {
   const uploadFile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return;
-    //TODO: Arpan - idhar add krna hai streaming ka logic
+    const socket = new  WebSocket("ws://localhost:3001/upload");
+
+    socket.onopen = () => {
+      console.log("Connected to server");
+    }
+
+    socket.onclose = () => {
+      console.log("Connection closed");
+    }
+
+    socket.onerror = (err) => {
+      console.error(err);
+    }
+
+    const reader = new FileReader();
+    reader.onload = async(e)=>{
+      if(!e.target?.result) return;
+
+      const data = new Uint8Array(e.target.result as ArrayBuffer);
+      const workbook = XLSX.read(data, {type: 'array'});
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const rows: any[] = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+      for (const row of rows){
+        if(row.length < 3) continue;
+        const [name,email,pincodes]:[string,string,string] = row;
+        const pincodesArray = pincodes
+          .split(",")
+          .filter((pincode)=> pincode.trim().length === 6)
+          .map((pincode) => parseInt(pincode.trim()))
+        
+        const data = {
+          name,
+          email,
+          pincodes: pincodesArray
+        };
+        console.log(data);
+        if(socket.readyState === socket.OPEN){
+          socket.send(JSON.stringify(data));
+        }else{
+          console.error("Socket not open");
+        }
+      }
+      if(socket.readyState === socket.OPEN){
+        socket.send("done");
+        socket.close();
+      }
+    }
+    reader.readAsArrayBuffer(file);
   };
 
   const addMerchant = async (e: React.FormEvent) => {
