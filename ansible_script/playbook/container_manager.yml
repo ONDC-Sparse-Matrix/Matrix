@@ -1,20 +1,22 @@
+# Set up basic server configurations
+
 - name: Build and run Docker container
-  hosts: host1
-  # gather_facts: true
+  hosts: all
+  gather_facts: true
   become: yes
   tasks:
-    - name: Check If Docker Is Installed
-      command: docker --version
+    # - name: Check If Docker Is Installed
+    #   command: docker --version
     
-    - name: Update the software package repository
-      pacman:
-        update_cache: yes
+    # - name: Update the software package repository
+    #   pacman:
+    #     update_cache: yes
 
-    - name: Clone the Git repository
-      git:
-        repo: "https://github.com/ONDC-Sparse-Matrix/Sparse-Matrix-PS"
-        dest: "/home/death/Desktop/test/"
-        update: yes 
+    # - name: Clone the Git repository
+    #   git:
+    #     repo: "https://github.com/ONDC-Sparse-Matrix/Sparse-Matrix-PS"
+    #     dest: "$HOME/test/"
+    #     update: yes 
      
     # - name: Ensure Docker is installed
     #   pacman:
@@ -30,19 +32,95 @@
         name: docker
         state: started
         enabled: yes
+    
+    # - name: Clean up the Docker images
+    #   shell: docker rm $(docker ps -q -a -f status=exited)
 
-   
-    - name: Move to repository directory
-      command: chdir=/home/death/Desktop/test/  ls
+# Build frontend container
+- name: Build and run frontend
+  hosts: frontend
+  gather_facts: true
+  become: yes
+  tasks:
+    - name: Build Docker image frontend
+      command: ls
+      command: docker build -t frontend $HOME/test/user-frontend
 
-    - name: Build Docker image
-      command: docker build -t frontend ./user-frontend
-
-    - name: Run Docker container
-      command: docker run -d --name Fronend_container frontend
-
-    - name: Ensure the Docker container is running
+    - name: Run Docker container frontend
+      command: docker run -d --name=fronend_container -p 3000:3000 frontend
+      ignore_errors: True 
+      
+    - name: Ensure the Docker container is running frontend
       docker_container:
-        name: Fronend_container
+        name: fronend_container
         image: frontend
         state: started
+      ignore_errors: True  
+
+# Build central_server container
+- name: Build and run 
+  hosts: centralServer
+  gather_facts: true
+  become: yes
+  tasks:
+    - name: Build Docker image central_server
+      command: ls
+      command: docker build -t central_server $HOME/test/centralCDN
+
+    - name: Run Docker container central_server
+      command: docker run -d --name=central_container -p 3001:3001 central_server
+      ignore_errors: True 
+
+    - name: Ensure the Docker container is running central_server
+      docker_container:
+        name: central_container
+        image: central_server
+        state: started
+      ignore_errors: True          
+
+# Build cache_server container
+- name: Build and run cache_server
+  hosts: cacheServer
+  gather_facts: true
+  become: yes
+  tasks:
+
+    - name: Build Docker image cache_server
+      command: ls
+      command: docker build -t cache_server $HOME/test/cacheServer
+
+    - name: Run Docker container cache_server
+      command: docker run -d --name=cache_container -p 4000:4000 cache_server
+      ignore_errors: True 
+
+    - name: Ensure the Docker container is running cache_server
+      docker_container:
+        name: cache_container
+        image: cache_server
+        state: started
+               
+
+ # Build regional_server container
+- name: Build and run regional_server
+  hosts: regionalServer
+  gather_facts: true
+  become: yes
+  tasks:
+
+    - name: Build Docker image regional_server
+      command: ls
+      command: docker build -t regional_server $HOME/test/backend-server
+
+    - name: Run Docker container regional_server
+      command: docker run -d --name=regional_container -p 5000:5000 regional_server
+      ignore_errors: True 
+    
+    - name: Ensure the Docker container is running regional_server
+      docker_container:
+        name: regional_container
+        image: regional_server
+        state: started
+      ignore_errors: True          
+
+
+#  ansible-playbook -v -K playbook/container_manager.yml -i Inventory/inventory.yml
