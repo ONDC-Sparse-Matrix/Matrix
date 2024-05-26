@@ -5,6 +5,8 @@ services:
     build: ./backendServer/
     depends_on:
       - backend-server-db
+    networks:
+      - my_network      
     # env_file:
     #   - ./backendServer/.env
 
@@ -41,7 +43,8 @@ services:
 
   cache-server:
     build: ./cacheServer/
-
+    networks:
+      - my_network
   # merchant-data-db:
   #   image: mongo
   #   ports:
@@ -57,3 +60,9 @@ services:
       - central-server
     ports:
       - "80:80"
+    networks:
+      - my_network  
+
+networks:
+  my_network:
+    driver: bridge
