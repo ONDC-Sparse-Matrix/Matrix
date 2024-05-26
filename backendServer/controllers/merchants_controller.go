@@ -93,7 +93,7 @@ func Send_SSE_Caching_responses (num int,clientId string) {
 		log.Println("Error in marshalling the data")
 	}
 	fmt.Println("request data",requestData)
-	resp, err := http.Post(configs.EnvCentralServerURI()+"/cache/"+clientId, "application/json", bytes.NewBuffer(jsonData)) 
+	resp, err := http.Post(configs.EnvCacheServerURI()+"/cache/"+clientId, "application/json", bytes.NewBuffer(jsonData)) 
 	if err != nil {
 		log.Println("Error in sending the cache response",err)
 	}

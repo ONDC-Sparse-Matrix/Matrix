@@ -45,3 +45,4 @@ trace.web
 # OS-specific files
 Thumbs.db
 .DS_Store
+Todo.json

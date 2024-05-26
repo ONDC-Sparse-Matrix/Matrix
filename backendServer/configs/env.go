@@ -15,11 +15,11 @@ func EnvMongoURI() string {
     return os.Getenv("MONGOURI")
 }
 
-func EnvCentralServerURI() string {
+func EnvCacheServerURI() string {
     err := godotenv.Load()
     if err != nil {
         log.Fatal("Error loading .env file")
     }
 
-    return os.Getenv("CENTRAL_SERVER_URL")
+    return os.Getenv("CACHE_SERVER_URL")
 }

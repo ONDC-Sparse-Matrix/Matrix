@@ -125,6 +125,7 @@ func main() {
 		log.Println("Client Cache Response: ", len(clientCacheResponse))
 
 		// //TODO: @DAGGER store the cacheResponse in the cache
+		go utils.UpdateCache(client, cacheResponse)
 
 		err = utils.PublishCache(queueConnection, clientId, cacheResponse)
 		if err != nil {
@@ -133,10 +134,10 @@ func main() {
 		return c.SendString("Stored Cache Response")
 	})
 
-	app.Get("/sse/:clientId",websocket.New(func(c *websocket.Conn){
+	app.Get("/sse/:clientId", websocket.New(func(c *websocket.Conn) {
 		clientId := c.Params("clientId")
 		utils.ConsumeCache(queueConnection, clientId, c)
-	
+
 	}))
 
 	app.Get("/upload", websocket.New(func(c *websocket.Conn) {

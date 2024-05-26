@@ -7,8 +7,10 @@ import { useState } from "react";
 import axios from "axios";
 import { FETCH_PINCODE_DATA } from "@/lib/endpoints";
 import { PincodeData, PincodeDataCache } from "@/lib/types";
-import { testPincodeData_1, testPincodeData_2 } from "@/lib/test-data";
+import { testPincodeData_1, testPincodeData_2 } from "@/lib/test-search-data";
 import { updateCache, searchCache } from "@/lib/db";
+import styles from "../components.module.css";
+import { MerchantPagination } from "./merchant-pagination";
 
 interface MerchantsProps {
   pincode: number;
@@ -22,6 +24,18 @@ export function Merchants(props: MerchantsProps) {
   const [cache, setCache] = useState<PincodeDataCache | undefined>(undefined);
   const [timeTakenForRequest, setTimeTakenForRequest] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const itemsPerPage: number = 4;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  //TODO: Ye abhi slice kr rakha hai data - gotta transfer it to backend
+  const totalItems = data?.merchantList.length || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data?.merchantList.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   // The main function
   const getMerchantData = async (pincode: string) => {
@@ -51,10 +65,9 @@ export function Merchants(props: MerchantsProps) {
 
       console.log('getting this data from request and set it up: ', getData)
 
-      let end = performance.now();
-      setTimeTakenForRequest(end - start); // in ms
-      setIsLoading(false);
-    }
+    let end = performance.now();
+    setTimeTakenForRequest(end - start); // in ms
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -89,9 +102,19 @@ export function Merchants(props: MerchantsProps) {
             pincode={props.pincode}
             time={timeTakenForRequest}
           />
-          {data?.merchantList.map((merchant, index) => (
-            <MerchantCard key={index} {...merchant} />
-          ))}
+
+          <div
+            className={`h-[50vh] my-4 border-b px-4 overflow-auto ${styles.sleek_scrollbar}`}
+          >
+            {currentItems?.map((merchant, index) => (
+              <MerchantCard key={index} {...merchant} />
+            ))}
+          </div>
+          <MerchantPagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
         </>
       )}
     </>
