@@ -49,7 +49,8 @@ func main() {
 		// 	{"pincode" : "22114094", "merchantList" : ["merchant1", "merchant2", "merchant3"]},
 		// 	{"pincode" : "22114093", "merchantList" : ["merchant1", "merchant2", "merchant3"]}
 		// ]`)
-
+		// pincodeInt, _ := strconv.Atoi(pincode)
+		// utils.UpdateFreqMap(pincodeInt)
 		// go utils.FetchMerchantData(pincode)
 		return c.SendString(body)
 	})
@@ -69,7 +70,7 @@ func main() {
 
 		//TODO: @DAGGER store the cacheResponse in the cache
 
-		//TODO: @Wayne store the clientCacheResponse in a Queue 
+		//TODO: @Wayne store the clientCacheResponse in a Queue
 
 	})
 
