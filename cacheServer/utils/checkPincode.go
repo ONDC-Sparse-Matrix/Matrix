@@ -31,7 +31,7 @@ const (
 // {pincode : 221144, merchantList : ["merchant1", "merchant2", "merchant3"]},
 // }
 
-func cacheMiss(pincode string, c *cache.Cache) types.SendPincodeInfo {
+func cacheMiss(pincode string, c *cache.Cache,clientId string) types.SendPincodeInfo {
 	// pincodeInt, _ := strconv.Atoi(pincode)
 	// for i := pincodeInt - 5; i <= pincodeInt+5; i++ {
 	fmt.Println("Cache miss")
@@ -42,7 +42,7 @@ func cacheMiss(pincode string, c *cache.Cache) types.SendPincodeInfo {
 	var sendPincodeInfo types.SendPincodeInfo
 	var sendPincodeInfo2 types.SendPincodeInfo
 
-	baseUrl := fmt.Sprintf("http://%s:%s/merchants/%s", types.Server.Host, types.Server.Port, pincode)
+	baseUrl := fmt.Sprintf("http://%s:%s/merchants/%s/%s", types.Server.Host, types.Server.Port, pincode,clientId)
 	fmt.Println(baseUrl)
 	resp, err := http.Get(baseUrl)
 	body, err := ioutil.ReadAll(resp.Body)
@@ -84,7 +84,7 @@ func cacheMiss(pincode string, c *cache.Cache) types.SendPincodeInfo {
 	return sendPincodeInfo2
 }
 
-func CheckPincode(pincode string, ctx *fiber.Ctx, c *cache.Cache) []byte {
+func CheckPincode(pincode string, ctx *fiber.Ctx, c *cache.Cache,clientId string) []byte {
 	types.PincodeInfoList = types.PincodeInfoList[:0]
 	var sendPincodeInfo types.SendPincodeInfo
 	var pincodeInfoList []types.PincodeInfo
@@ -114,7 +114,7 @@ func CheckPincode(pincode string, ctx *fiber.Ctx, c *cache.Cache) []byte {
 		}
 		sendPincodeInfo.Cache = pincodeInfoList
 	} else {
-		sendPincodeInfo = cacheMiss(pincode, c)
+		sendPincodeInfo = cacheMiss(pincode, c,clientId)
 	}
 	jsonData, _ := json.Marshal(sendPincodeInfo)
 	return jsonData
