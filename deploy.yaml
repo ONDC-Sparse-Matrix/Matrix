@@ -1,0 +1,56 @@
+version: '2.27.0'
+
+services:
+  backend-server:
+    build: ./backendServer/
+    depends_on:
+      - backend-server-db
+    env_file:
+      - ./backendServer/.env
+
+  backend-server-db:
+    image: mongo
+    ports:
+      - 27019:27017
+
+  rabbit:
+    image: matrix-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-server -status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  central-server:
+    build: ./centralServer/
+    env_file:
+      - ./centralServer/.env
+    depends_on:
+      rabbit:
+        condition: service_healthy
+      merchant-data-db:
+        condition: service_started
+      backend-server-db:
+        condition: service_started
+    ports:
+      - "3001:3001"
+    restart: always
+
+  cache-server:
+    build: ./cacheServer/
+
+  merchant-data-db:
+    image: mongo
+    ports:
+      - 27018:27017
+
+  frontend:
+    image: matrix-frontend
+    depends_on:
+      - backend-server
+      - central-server
+    ports:
+      - "80:80"
