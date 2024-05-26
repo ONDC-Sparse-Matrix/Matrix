@@ -16,3 +16,8 @@ export type PincodeDataCache = {
   pincode: string;
   merchantList: MerchantData[];
 }[];
+
+export type Location = {
+  lat: number;
+  lng: number;
+};

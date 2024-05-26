@@ -1,7 +1,7 @@
 "use-client";
 
 import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
+import { Plus, BarChart2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Tooltip,
@@ -10,10 +10,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+
 export function Navbar() {
   return (
     <>
-      <nav className="bg-transparent w-full fixed backdrop-blur-lg dark:bg-gray-900">
+      <nav className="bg-white w-full fixed backdrop-blur-lg dark:bg-gray-900">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <a
             href="/"
@@ -36,6 +37,18 @@ export function Navbar() {
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Add Merchant</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </Link>
+                  <Link to="/analytics">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant={"link"}>
+                          <BarChart2 />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View Analytics</p>
                       </TooltipContent>
                     </Tooltip>
                   </Link>
