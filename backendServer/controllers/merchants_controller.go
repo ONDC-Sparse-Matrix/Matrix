@@ -48,7 +48,7 @@ func Send_SSE_Caching_responses (num int,clientId string) {
 	defer cancel()
 	//TODO: @Garv currently the cache_range is hardcoded , but we have to apply some algorithm to calculate the cache_range
 	//To Central server
-	central_cache_range := 5
+	central_cache_range := 50
 	cacheResponse := make([]PincodeInfo, 0)
 	//! hande the case when num is less than central_cache_range
 	for i :=num-central_cache_range; i<num+central_cache_range; i++{

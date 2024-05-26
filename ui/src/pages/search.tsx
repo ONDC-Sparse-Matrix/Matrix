@@ -27,7 +27,7 @@ export default function Search() {
       }
 
       return ()=>{
-          socket?.close();
+          // socket?.close();
      }
     }
 

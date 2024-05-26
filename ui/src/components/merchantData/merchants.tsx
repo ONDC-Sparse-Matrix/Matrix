@@ -36,11 +36,20 @@ export function Merchants(props: MerchantsProps) {
       setTimeTakenForRequest(end - start); // in ms
       setIsLoading(false);
     } else {
-      axios
-        .post<PincodeData>(`http://localhost:3001/pincode/${pincode}`, {
-          session: props.sessionId,
+      let getData;
+      getData = await new Promise<PincodeData | null>((resolve, reject) => {
+        axios.post<PincodeData>(`${FETCH_PINCODE_DATA}/${pincode}`, {
+          session: props.sessionId
         })
-        .then((res: any) => { setData(res.data); console.log(res.data); });
+        .then((res) => {
+          resolve(res.data)
+        }).catch((err) => {
+          reject(null);
+        })
+      })
+      setData(getData?.current)
+
+      console.log('getting this data from request and set it up: ', getData)
 
       let end = performance.now();
       setTimeTakenForRequest(end - start); // in ms
