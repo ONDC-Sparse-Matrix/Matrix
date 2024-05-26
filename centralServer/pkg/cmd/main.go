@@ -125,6 +125,7 @@ func main() {
 		log.Println("Client Cache Response: ", len(clientCacheResponse))
 
 		// //TODO: @DAGGER store the cacheResponse in the cache
+		go utils.UpdateCache(client, cacheResponse, )
 
 		err = utils.PublishCache(queueConnection, clientId, cacheResponse)
 		if err != nil {
