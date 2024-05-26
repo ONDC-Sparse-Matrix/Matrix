@@ -5,34 +5,34 @@ services:
     build: ./backendServer/
     depends_on:
       - backend-server-db
-    env_file:
-      - ./backendServer/.env
+    # env_file:
+    #   - ./backendServer/.env
 
-  backend-server-db:
-    image: mongo
-    ports:
-      - 27019:27017
+  # backend-server-db:
+  #   image: mongo
+  #   ports:
+  #     - 27019:27017
 
-  rabbit:
-    image: matrix-rabbit
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    healthcheck:
-      test: ["CMD-SHELL", "rabbitmq-server -status"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  # rabbit:
+  #   image: matrix-rabbit
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "rabbitmq-server -status"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
 
   central-server:
     build: ./centralServer/
-    env_file:
-      - ./centralServer/.env
+    # env_file:
+    #   - ./centralServer/.env
     depends_on:
-      rabbit:
-        condition: service_healthy
-      merchant-data-db:
-        condition: service_started
+      # rabbit:
+      #   condition: service_healthy
+      # merchant-data-db:
+      #   condition: service_started
       backend-server-db:
         condition: service_started
     ports:
@@ -42,13 +42,16 @@ services:
   cache-server:
     build: ./cacheServer/
 
-  merchant-data-db:
-    image: mongo
-    ports:
-      - 27018:27017
+  # merchant-data-db:
+  #   image: mongo
+  #   ports:
+  #     - 27018:27017
 
   frontend:
-    image: matrix-frontend
+    # image: matrix-frontend
+    build: ./ui/
+    # env_file:
+    #   - ./ui/.env
     depends_on:
       - backend-server
       - central-server
