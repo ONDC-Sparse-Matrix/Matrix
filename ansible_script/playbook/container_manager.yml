@@ -1,23 +1,16 @@
 # Set up basic server configurations
 
 - name: Build and run Docker container
-  hosts: all
+  hosts: frontend #all
   gather_facts: true
   become: yes
   tasks:
-    # - name: Check If Docker Is Installed
-    #   command: docker --version
-    
-    # - name: Update the software package repository
-    #   pacman:
-    #     update_cache: yes
+    - name: Clone the Git repository
+      git:
+        repo: "https://github.com/ONDC-Sparse-Matrix/Sparse-Matrix-PS"
+        dest: "$HOME/test"
+        update: yes 
 
-    # - name: Clone the Git repository
-    #   git:
-    #     repo: "https://github.com/ONDC-Sparse-Matrix/Sparse-Matrix-PS"
-    #     dest: "$HOME/test/"
-    #     update: yes 
-     
     # - name: Ensure Docker is installed
     #   pacman:
     #     name: docker
@@ -27,21 +20,29 @@
     #   async: 30
     #   poll: 30
 
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
+    # - name: Start Docker service
+    #   service:
+    #     name: docker
+    #     state: started
+    #     enabled: yes
     
     # - name: Clean up the Docker images
     #   shell: docker rm $(docker ps -q -a -f status=exited)
 
-# Build frontend container
+Build frontend container
+
 - name: Build and run frontend
   hosts: frontend
   gather_facts: true
   become: yes
   tasks:
+    - name: Generate .env file
+      copy:
+        dest: "$HOME/test/user-frontend/.env"
+        content: |
+          MONGOURI=mongodb://localhost:27017 
+          CENTRAL_SERVER_URL=http://localhost:3001   
+
     - name: Build Docker image frontend
       command: ls
       command: docker build -t frontend $HOME/test/user-frontend
@@ -56,13 +57,23 @@
         image: frontend
         state: started
       ignore_errors: True  
+    
 
-# Build central_server container
+Build central_server container
+
+
 - name: Build and run 
   hosts: centralServer
   gather_facts: true
   become: yes
   tasks:
+    - name: Generate .env file
+      copy:
+        dest: "$HOME/test/user-frontend/.env"
+        content: |
+          MONGOURI=mongodb://localhost:27017 
+          CENTRAL_SERVER_URL=http://localhost:3001   
+    
     - name: Build Docker image central_server
       command: ls
       command: docker build -t central_server $HOME/test/centralCDN
@@ -84,6 +95,12 @@
   gather_facts: true
   become: yes
   tasks:
+    - name: Generate .env file
+      copy:
+        dest: "$HOME/test/user-frontend/.env"
+        content: |
+          MONGOURI=mongodb://localhost:27017 
+          CENTRAL_SERVER_URL=http://localhost:3001   
 
     - name: Build Docker image cache_server
       command: ls
@@ -106,6 +123,13 @@
   gather_facts: true
   become: yes
   tasks:
+
+    - name: Generate .env file
+      copy:
+        dest: "$HOME/test/user-frontend/.env"
+        content: |
+          MONGOURI=mongodb://localhost:27017 
+          CENTRAL_SERVER_URL=http://localhost:3001
 
     - name: Build Docker image regional_server
       command: ls
