@@ -56,7 +56,7 @@ func main() {
 	defer client.Disconnect(ctx)
 
 	config := fiber.Config{
-		ServerHeader: "Cache Server",
+		ServerHeader: "Central Server",
 		Prefork:      true,
 		// Concurrency:  1024 * 512,
 	}
@@ -111,6 +111,7 @@ func main() {
 
 	app.Post("/cache/:clientId", func(c *fiber.Ctx) error {
 		clientId := c.Params("clientId")
+		fmt.Println("Here =====")
 		var response types.CachePayload
 		err := json.Unmarshal(c.Body(), &response)
 		if err != nil {
@@ -125,7 +126,7 @@ func main() {
 		log.Println("Client Cache Response: ", len(clientCacheResponse))
 
 		// //TODO: @DAGGER store the cacheResponse in the cache
-		go utils.UpdateCache(clientId, cacheResponse)
+		go utils.UpdateCache(clientId, response)
 
 		err = utils.PublishCache(queueConnection, clientId, cacheResponse)
 		if err != nil {

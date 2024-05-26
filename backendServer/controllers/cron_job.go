@@ -29,7 +29,7 @@ func InitCronJob() {
 	c := cron.New(cron.WithSeconds())
 
 	// Schedule the task to run every minute
-	_, err := c.AddFunc("0 */1 * * * *", myScheduledTask)
+	_, err := c.AddFunc("0 */70 * * * *", myScheduledTask)
 	if err != nil {
 		log.Fatalf("Error scheduling task: %v", err)
 	}

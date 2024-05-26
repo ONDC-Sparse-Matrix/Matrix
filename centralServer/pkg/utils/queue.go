@@ -66,7 +66,7 @@ func ConsumeCache(Connection *amqp.Connection, clientId string, c *websocket.Con
 	}
 
 	for msg := range msgs {
-		fmt.Println("Message Received", string(msg.Body))
+		// fmt.Println("Message Received", string(msg.Body))
 		err := c.WriteMessage(websocket.TextMessage, msg.Body)
 		if err != nil {
 			fmt.Println("Error sending SSE:", err)

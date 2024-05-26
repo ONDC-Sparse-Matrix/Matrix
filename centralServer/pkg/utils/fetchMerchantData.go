@@ -44,6 +44,7 @@ func ChooseServerURL(pincode string, clientId string) string {
 func FetchMerchantData(pincode string, clientId string) string {
 	baseUrl := ChooseServerURL(pincode, clientId)
 	fmt.Println("hehe = ", baseUrl)
+	fmt.Println("ClinentID === ",clientId)
 	baseUrl2 := fmt.Sprintf("%spincode/%s/%s",baseUrl,pincode,clientId)
 	// baseUrl = baseUrl + "pincode/" + pincode + "/" + clientId
 	fmt.Println(baseUrl2)
@@ -59,15 +60,20 @@ func FetchMerchantData(pincode string, clientId string) string {
 	return string(body)
 }
 
-func UpdateCache(clintId string, cacheResponse []types.PincodeInfo) {
+func UpdateCache(clintId string, response types.CachePayload) {
 	fmt.Println("Updating cache")
-	samplePin := cacheResponse[0].Pincode
+	samplePin := response.CacheResponse[0].Pincode
 	baseUrl := ChooseServerURL(samplePin, clintId)
-	jsonData, _ := json.Marshal(cacheResponse)
+	baseUrl2 := baseUrl + "update/"
+	fmt.Println(baseUrl2)
+	fmt.Println(response)
+	jsonData, _ := json.Marshal(response)
+	fmt.Println("Marshaled cache",string(jsonData))
 
-	resp, err := http.Post(baseUrl, "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post(baseUrl, "application/", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Println("Error in sending the cache response", err)
 	}
 	defer resp.Body.Close()
+	fmt.Println(resp)
 }

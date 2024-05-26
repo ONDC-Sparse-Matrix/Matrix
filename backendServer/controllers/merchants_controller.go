@@ -44,6 +44,8 @@ type PincodeInfo struct {
 var PincodeInfoList []PincodeInfo
 
 func Send_SSE_Caching_responses (num int,clientId string) {
+
+	fmt.Println("INside SSE =================================")
 	ctx,cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 	//TODO: @Garv currently the cache_range is hardcoded , but we have to apply some algorithm to calculate the cache_range
@@ -82,7 +84,7 @@ func Send_SSE_Caching_responses (num int,clientId string) {
 		}
 		cacheResponse = append(cacheResponse, pincodeInfo)
 	}
-	log.Println("Cache Response",cacheResponse)
+	// log.Println("Cache Response",cacheResponse)
 
 	requestData := map[string]interface{}{
 		"cacheResponse": cacheResponse,
@@ -92,8 +94,10 @@ func Send_SSE_Caching_responses (num int,clientId string) {
 	if err != nil {
 		log.Println("Error in marshalling the data")
 	}
-	fmt.Println("request data",requestData)
-	resp, err := http.Post(configs.EnvCacheServerURI()+"/cache/"+clientId, "application/json", bytes.NewBuffer(jsonData)) 
+	// fmt.Println("request data",requestData)
+	baseUrl := configs.EnvCacheServerURI()
+	fmt.Println("=======================================",baseUrl)
+	resp, err := http.Post(baseUrl+"/cache/"+clientId, "application/json", bytes.NewBuffer(jsonData)) 
 	if err != nil {
 		log.Println("Error in sending the cache response",err)
 	}
@@ -102,7 +106,7 @@ func Send_SSE_Caching_responses (num int,clientId string) {
 }
 
 func GetMerchants(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)//! reduce the context time here , as Send_SSE_Caching_responses is taking more time
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)//! reduce the context time here , as Send_SSE_Caching_responses is taking more time
 	defer cancel()
 
 	pinCode := c.Params("pincode")
