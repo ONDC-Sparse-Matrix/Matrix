@@ -3,11 +3,14 @@ package main
 import (
 	"cache-server/utils"
 	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/patrickmn/go-cache"
+
 	// "net/http"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"time"
+
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func Initialize() {
@@ -15,7 +18,7 @@ func Initialize() {
 }
 
 func main() {
-	
+
 	Initialize()
 	cache1 := cache.New(48*time.Hour, 48*time.Hour)
 	config := fiber.Config{ServerHeader: "Cache Server", Prefork: true}
@@ -35,17 +38,17 @@ func main() {
 		pincode := c.Params("pincode")
 		clientId := c.Params("clientId")
 		fmt.Println("pincode", pincode)
-		jsonData := utils.CheckPincode(pincode, c, cache1,clientId)
+		jsonData := utils.CheckPincode(pincode, c, cache1, clientId)
 		return c.SendString(string(jsonData))
 	})
 	type UpdateRequestBody struct {
 		PincodeList []string `json:"pincodeList"`
 	}
 
-	app.POst("/update/", func(c *fiber.Ctx) error {
+	app.Post("/update/", func(c *fiber.Ctx) error {
 		// Parse the request body into a struct
 		fmt.Println("Heyaaaaaaa===============")
-		
+
 		fmt.Println(c.Body())
 
 		// var requestBody UpdateRequestBody

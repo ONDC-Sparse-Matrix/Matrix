@@ -1,10 +1,10 @@
-version: '2.27.0'
+version: '1.29.0'
 
 services:
   backend-server:
     build: ./backendServer/
-    depends_on:
-      - backend-server-db
+    # depends_on:
+    #   - backend-server-db
     networks:
       - my_network      
     # env_file:
@@ -30,13 +30,13 @@ services:
     build: ./centralServer/
     # env_file:
     #   - ./centralServer/.env
-    depends_on:
+    # depends_on:
       # rabbit:
       #   condition: service_healthy
       # merchant-data-db:
       #   condition: service_started
-      backend-server-db:
-        condition: service_started
+      # backend-server-db:
+      #   condition: service_started
     ports:
       - "3001:3001"
     restart: always
