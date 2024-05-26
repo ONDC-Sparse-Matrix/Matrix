@@ -15,19 +15,19 @@ import (
 func ChooseServerURL(pincode string, clientId string) string {
 	var cacheServer types.CacheServer
 	pincodeInt, _ := strconv.Atoi(pincode)
-	regionCode := pincodeInt / 100000
-	switch regionCode {
-	case 1, 2:
+	// regionCode := pincodeInt / 100000
+	// switch regionCode {
+	// case 1, 2:
 		cacheServer = types.CacheServerList[0]
-	case 3, 4:
-		cacheServer = types.CacheServerList[1]
-	case 5, 6:
-		cacheServer = types.CacheServerList[2]
-	case 7, 8, 9:
-		cacheServer = types.CacheServerList[3]
-	default:
-		return "Invalid Pincode"
-	}
+	// case 3, 4:
+	// 	cacheServer = types.CacheServerList[1]
+	// case 5, 6:
+	// 	cacheServer = types.CacheServerList[2]
+	// case 7, 8, 9:
+	// 	cacheServer = types.CacheServerList[3]
+	// default:
+	// 	return "Invalid Pincode"
+	// }
 	baseUrl := fmt.Sprintf("http://%s:%s/", cacheServer.Host, cacheServer.Port)
 	fmt.Println(baseUrl)
 	resp, err := http.Get(baseUrl)
