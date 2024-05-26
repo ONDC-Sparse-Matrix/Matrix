@@ -35,6 +35,7 @@ func cacheMiss(pincode string, c *cache.Cache,clientId string) types.SendPincode
 	// pincodeInt, _ := strconv.Atoi(pincode)
 	// for i := pincodeInt - 5; i <= pincodeInt+5; i++ {
 	fmt.Println("Cache miss")
+	fmt.Println("ClinentID === ",clientId)
 	var pincodeInfo types.PincodeInfo
 	var newPincodeInfoList []types.PincodeInfo
 	// var currentPincodeInfo types.PincodeInfo
@@ -122,11 +123,27 @@ func CheckPincode(pincode string, ctx *fiber.Ctx, c *cache.Cache,clientId string
 
 func CheckCache(pincodeList []string, c *cache.Cache) {
 
-	for _, pincode := range pincodeList {
-		if x, found := c.Get(pincode); found {
-			fmt.Println("Cache hit now update")
-			cacheInfo := x.(types.CacheInfo)
-			cacheInfo.MerchantList = append(cacheInfo.MerchantList)
-		}
-	}
+	// for _, pincode := range pincodeList {
+	// 	if x, found := c.Get(pincode); found {
+	// 		fmt.Println("Cache hit now update")
+	// 		cacheInfo := x.(types.CacheInfo)
+	// 		cacheInfo.MerchantList = append(cacheInfo.MerchantList)
+	// 	}
+	// }
+	fmt.Println(pincodeList)
+	// for _, PincodeInfo := range sendPincodeInfo.Cache {
+	// 	var cacheInfo types.CacheInfo
+
+	// 	pincodeInfo.MerchantList = PincodeInfo.MerchantList
+	// 	pincodeInfo.Pincode = PincodeInfo.Pincode
+	// 	fmt.Println("asdasd ", pincodeInfo, "\n\n")
+	// 	count++
+	// 	if count >= startIndex && count <= endIndex {
+	// 		newPincodeInfoList = append(newPincodeInfoList, pincodeInfo)
+	// 	}
+	// 	cacheInfo.LastModified = time.Now().UTC()
+	// 	cacheInfo.MerchantList = PincodeInfo.MerchantList
+	// 	c.Set(pincode, cacheInfo, cache.DefaultExpiration)
+		// fmt.Printf("Pincode: %s, Merchants: %v\n", PincodeInfo.Pincode, PincodeInfo.MerchantList)
+	// }
 }
