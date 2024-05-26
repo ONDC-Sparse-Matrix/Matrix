@@ -1,0 +1,48 @@
+.env
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+*.exe
+*.dll
+
+# Folders
+/_test
+/vendor
+
+# Binary files
+*.exe
+*.dll
+*.out
+
+.env
+
+# Local binary files
+/bin/
+/pkg/
+
+# go run
+*.run
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Testing
+*.test
+
+# Output of go tool trace
+trace.out
+
+# Output of go tool trace in the "web" format
+trace.web
+
+# Visual Studio Code config folder
+.vscode/
+
+# .idea folder
+.idea/
+
+# OS-specific files
+Thumbs.db
+.DS_Store
+Todo.json

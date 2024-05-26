@@ -7,7 +7,7 @@ import (
 )
 
 func MerchantRouter(app *fiber.App) {
-	app.Get("/merchants/:pincode", controllers.GetMerchants)
+	app.Get("/merchants/:pincode/:clientID", controllers.GetMerchants)
 	app.Post("/merchants/new",controllers.AddMerchants)
 	// app.Put("/merchants/update/:id",controllers.UpdateMerchant)
 }

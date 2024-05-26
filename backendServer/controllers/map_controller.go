@@ -1,12 +1,6 @@
 package controllers
 
 import (
-	// "context"
-	// "net/http"
-	// "regional_server/configs"
-	// "regional_server/models"
-	// "regional_server/responses"
-	// "time"
 
 	"context"
 	"net/http"
@@ -16,18 +10,13 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/bson/primitive"
-	// "go.mongodb.org/mongo-driver/mongo"
-	// "fmt"
+
 )
 
 func UpdateMap(c *fiber.Ctx) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
-	// pinCode := c.Params("pincode")
 
 	var merchants models.Map
 	err := mapCollection.FindOne(ctx, bson.M{}).Decode(&merchants)

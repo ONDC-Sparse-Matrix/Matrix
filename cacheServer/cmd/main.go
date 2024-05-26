@@ -23,10 +23,11 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
-	app.Get("/pincode/:pincode?", func(c *fiber.Ctx) error {
+	app.Get("/pincode/:pincode?/:clientId?", func(c *fiber.Ctx) error {
 		pincode := c.Params("pincode")
+		clientId := c.Params("clientId")
 		fmt.Println("pincode", pincode)
-		jsonData := utils.CheckPincode(pincode, c, cache1)
+		jsonData := utils.CheckPincode(pincode, c, cache1,clientId)
 		return c.SendString(string(jsonData))
 	})
 	type UpdateRequestBody struct {

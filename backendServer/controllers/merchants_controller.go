@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"regional_server/configs"
 	"regional_server/models"
@@ -21,8 +22,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var mapCollection *mongo.Collection = configs.GetCollection(configs.DB, "maps")
-var merchantsCollection *mongo.Collection = configs.GetCollection(configs.DB, "merchants")
+var mapCollection *mongo.Collection = configs.DB.Database("matrix_map_1").Collection("pincode_map")
+var merchantsCollection *mongo.Collection = configs.DB.Database("matrix_merchants").Collection("merchant_details") //TODO: @Wayne write logic to get collection names
 
 type NewMerchant struct {
 	Name     string   `json:"name"`
@@ -37,84 +38,93 @@ type UpdateMerchant struct {
 }
 type PincodeInfo struct {
 	Pincode      string        `json:"pincode"`
-	MerchantList []NewMerchant `json:"merchantList"`
+	MerchantList []models.Merchant `json:"merchantList"`
 }
 
 var PincodeInfoList []PincodeInfo
 
+func Send_SSE_Caching_responses (num int,clientId string) {
+	ctx,cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	defer cancel()
+	//TODO: @Garv currently the cache_range is hardcoded , but we have to apply some algorithm to calculate the cache_range
+	//To Central server
+	central_cache_range := 5
+	cacheResponse := make([]PincodeInfo, 0)
+	//! hande the case when num is less than central_cache_range
+	for i :=num-central_cache_range; i<num+central_cache_range; i++{
+		log.Println("i",i)
+		var current_pincode_map models.Map
+		formattedString := strconv.FormatInt(int64(i),10)
+		err := mapCollection.FindOne(context.Background(), bson.M{"_id": i}).Decode(&current_pincode_map)
+		if err != nil {
+			fmt.Println(i, "th Pincode data Not Found")
+			fmt.Println(err)
+			continue
+		}
+		merchant_ids_arr := current_pincode_map.MERCHANT_IDS
+		//get the details of the merchants from their ids
+		merchant_details := make([]models.Merchant, 0)
+		for _, merchant_id := range merchant_ids_arr{
+			var merchant models.Merchant
+			objID, err := primitive.ObjectIDFromHex(merchant_id)
+			if err != nil {
+				log.Println("Error in converting to ObjectID")
+			}
+			err = merchantsCollection.FindOne(ctx, bson.M{"_id": objID}).Decode(&merchant)
+			if err != nil {
+				log.Println("Error in fetching merchant details")
+			}
+			merchant_details = append(merchant_details, merchant)
+		}
+		pincodeInfo := PincodeInfo{
+			Pincode:      formattedString,
+			MerchantList: merchant_details,
+		}
+		cacheResponse = append(cacheResponse, pincodeInfo)
+	}
+	log.Println("Cache Response",cacheResponse)
+
+	requestData := map[string]interface{}{
+		"cacheResponse": cacheResponse,
+		"clientCacheResponse": cacheResponse,
+	}
+	jsonData, err := json.Marshal(requestData)
+	if err != nil {
+		log.Println("Error in marshalling the data")
+	}
+	fmt.Println("request data",requestData)
+	resp, err := http.Post(configs.EnvCacheServerURI()+"/cache/"+clientId, "application/json", bytes.NewBuffer(jsonData)) 
+	if err != nil {
+		log.Println("Error in sending the cache response",err)
+	}
+	defer resp.Body.Close()
+	fmt.Println("Cache Response sent successfully.")
+}
+
 func GetMerchants(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)//! reduce the context time here , as Send_SSE_Caching_responses is taking more time
 	defer cancel()
 
 	pinCode := c.Params("pincode")
-	fmt.Println(pinCode)
+	clientID := c.Params("clientID") //TODO: @Garv generate an uniqueID for every client and send this with the request
+	fmt.Println("pincode",pinCode)
+	fmt.Println("ClientID",clientID)
 
-	num, err := strconv.ParseFloat(pinCode, 64)
-	//??
+	num, err := strconv.ParseInt(pinCode, 10, 64)
+	
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(responses.Response{
 			Status:  http.StatusBadRequest,
-			Message: "error",
+			Message: "Incorrect Pincode", //TODO: @Garv for this error show a message in the frontend
 			Data:    &fiber.Map{"data": err.Error()},
 		})
 	}
-	cacheResponse := make([]PincodeInfo, 0)
-	// finding cache responses
-	fmt.Println(num)
-	for i := num - 30; i < num+30; i++ {
-		fmt.Println("heheheh = ", i)
-		var cacheMerchants models.Map
-		formatedString := strconv.FormatFloat(i, 'f', -1, 64)
-		println(formatedString)
-		err = mapCollection.FindOne(ctx, bson.M{"pin_code": formatedString}).Decode(&cacheMerchants)
-		if err != nil {
-			fmt.Println(cacheMerchants, " Not Found")
-			fmt.Println(err)
-			continue
-			// return c.Status(http.StatusInternalServerError).JSON(responses.Response{
-			// 	Status:  http.StatusInternalServerError,
-			// 	Message: "error",
-			// 	Data:    &fiber.Map{"data": err.Error()},
-			// })
-		}
-		cacheArr := cacheMerchants.MERCHANT_IDS
-		fmt.Println(cacheArr)
-		cacheSingleresponse := make([]NewMerchant, 0)
-		for _, cacheR := range cacheArr {
-			var cacheM NewMerchant
-			objID, err := primitive.ObjectIDFromHex(cacheR)
-			if err != nil {
-				return c.Status(http.StatusInternalServerError).JSON(responses.Response{
-					Status:  http.StatusInternalServerError,
-					Message: "error",
-					Data:    &fiber.Map{"data": err.Error()},
-				})
-			}
-			// fmt.Println(cacheR)
-			err = merchantsCollection.FindOne(ctx, bson.M{"_id": objID}).Decode(&cacheM)
-			if err != nil {
-				return c.Status(http.StatusInternalServerError).JSON(responses.Response{
-					Status:  http.StatusInternalServerError,
-					Message: "error",
-					Data:    &fiber.Map{"data": err.Error()},
-				})
-			}
-			cacheSingleresponse = append(cacheSingleresponse, cacheM)
-		}
 
-		iStrstr := strconv.FormatFloat(i, 'f', -1, 64)
-		var pincodeInfo PincodeInfo
-		pincodeInfo.MerchantList = cacheSingleresponse
-		pincodeInfo.Pincode = iStrstr
-		fmt.Println("pincode = ", pincodeInfo)
-		cacheResponse = append(cacheResponse, pincodeInfo)
-	}
-	fmt.Println("CACHE RESPONSE", cacheResponse)
+	go Send_SSE_Caching_responses(int(num),clientID)
+
 	// finding current response
 	var merchants models.Map
-	err = mapCollection.FindOne(ctx, bson.M{"pin_code": pinCode}).Decode(&merchants)
-	fmt.Println("ERROR", err)
-	fmt.Println("CURRENT RESPONSE", merchants)
+	err = mapCollection.FindOne(ctx, bson.M{"_id": num}).Decode(&merchants)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(responses.Response{
 			Status:  http.StatusInternalServerError,
@@ -157,9 +167,11 @@ func GetMerchants(c *fiber.Ctx) error {
 				"pincode":      pinCode,
 				"merchantList": response,
 			},
-			"cache": cacheResponse,
+			// "cache": cacheResponse, 
 		},
 	})
+
+	
 }
 
 func AddMerchants(c *fiber.Ctx) error {
@@ -195,7 +207,7 @@ func AddMerchants(c *fiber.Ctx) error {
 			objID, _ := primitive.ObjectIDFromHex(insertResult.InsertedID.(primitive.ObjectID).Hex())
 			_, err := mapCollection.UpdateOne(
 				ctx,
-				bson.M{"pin_code": pinCode},
+				bson.M{"_id": pinCode},
 				bson.M{"$push": bson.M{"merchant_ids": objID}},
 			)
 
@@ -243,6 +255,25 @@ func AddMerchants(c *fiber.Ctx) error {
 	})
 }
 
+
+func Test(c *fiber.Ctx) error {
+	collection := configs.DB.Database("matrix_map_1").Collection("pincode_map")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	var data any
+	err := collection.FindOne(ctx, bson.M{"_id":"151505"}).Decode(&data)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(responses.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "error",
+			Data:    &fiber.Map{"data": err.Error()},
+		})
+	}
+	return c.Status(http.StatusOK).JSON(responses.Response{
+		Data: &fiber.Map{"data": data},
+	})
+
+}
 // func UpdateMerchant(c *fiber.Ctx)error{
 // 	/*
 // 	request ->
