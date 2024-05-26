@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"log"
-	"os/exec"
+	// "os/exec"
 
 	"github.com/robfig/cron/v3"
 )
@@ -10,14 +10,14 @@ import (
 // myScheduledTask is the task that will be run every minute
 func myScheduledTask() {
 
-	dumpPath := "./dump/"
-	uri := "mongodb://localhost:27017"
-	cmd := exec.Command("mongodump", "--uri", uri, "--out", dumpPath)
+	// dumpPath := "./dump/"
+	// uri := "mongodb://localhost:27017"
+	// cmd := exec.Command("mongodump", "--uri", uri, "--out", dumpPath)
 
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err := cmd.Run()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	log.Println("Data dumped successfully...")
 

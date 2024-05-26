@@ -9,12 +9,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
+	// "strconv"
 )
 
 func ChooseServerURL(pincode string, clientId string) string {
 	var cacheServer types.CacheServer
-	pincodeInt, _ := strconv.Atoi(pincode)
+	// pincodeInt, _ := strconv.Atoi(pincode)
 	// regionCode := pincodeInt / 100000
 	// switch regionCode {
 	// case 1, 2:
@@ -30,25 +30,28 @@ func ChooseServerURL(pincode string, clientId string) string {
 	// }
 	baseUrl := fmt.Sprintf("http://%s:%s/", cacheServer.Host, cacheServer.Port)
 	fmt.Println(baseUrl)
-	resp, err := http.Get(baseUrl)
+	// resp, err := http.Get(baseUrl)
 
-	if err != nil {
-		return "Error fetching data"
-	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
-	return string(body)
+	// if err != nil {
+	// 	return "36 Error fetching data"
+	// }
+	// defer resp.Body.Close()
+	// body, _ := ioutil.ReadAll(resp.Body)
+	// fmt.Println(string(body))
+	return baseUrl
 }
 
 func FetchMerchantData(pincode string, clientId string) string {
 	baseUrl := ChooseServerURL(pincode, clientId)
-	baseUrl = baseUrl + "pincode/" + pincode + "/" + clientId
-	fmt.Println(baseUrl)
-	resp, err := http.Get(baseUrl)
+	fmt.Println("hehe = ", baseUrl)
+	baseUrl2 := fmt.Sprintf("%spincode/%s/%s",baseUrl,pincode,clientId)
+	// baseUrl = baseUrl + "pincode/" + pincode + "/" + clientId
+	fmt.Println(baseUrl2)
+	resp, err := http.Get(baseUrl2)
 
 	if err != nil {
-		return "Error fetching data"
+		fmt.Print("ERROR",err)
+		return "51 Error fetching data"
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)

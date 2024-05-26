@@ -102,7 +102,7 @@ func main() {
 		}
 		fmt.Println("Client ID: ", clientId.ClientID)
 
-		fmt.Println("Pincode", pincode)
+		fmt.Println("Pincode === ", pincode)
 		body := utils.FetchMerchantData(pincode, clientId.ClientID)
 
 		return c.SendString(body)
@@ -125,7 +125,7 @@ func main() {
 		log.Println("Client Cache Response: ", len(clientCacheResponse))
 
 		// //TODO: @DAGGER store the cacheResponse in the cache
-		go utils.UpdateCache(client, cacheResponse)
+		go utils.UpdateCache(clientId, cacheResponse)
 
 		err = utils.PublishCache(queueConnection, clientId, cacheResponse)
 		if err != nil {

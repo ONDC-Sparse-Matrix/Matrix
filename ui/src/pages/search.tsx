@@ -2,6 +2,8 @@ import { SearchBar } from "@/components/searchbar";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/navbar";
 import { Merchants } from "@/components/merchantData/merchants";
+import { useEffect } from "react";
+import { updateCache } from "@/lib/db";
 
 export default function Search() {
   const [searchParams] = useSearchParams();

@@ -18,33 +18,27 @@ interface MerchantsProps {
 }
 
 export function Merchants(props: MerchantsProps) {
-  const [data, setData] = useState<PincodeData["current"] | undefined>(
-    undefined
-  );
+  const [data, setData] = useState<PincodeData["current"] | undefined>(undefined);
   const [cache, setCache] = useState<PincodeDataCache | undefined>(undefined);
   const [timeTakenForRequest, setTimeTakenForRequest] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const itemsPerPage: number = 4;
   const [currentPage, setCurrentPage] = useState<number>(1);
-  //TODO: Ye abhi slice kr rakha hai data - gotta transfer it to backend
   const totalItems = data?.merchantList.length || 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data?.merchantList.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = data?.merchantList.slice(indexOfFirstItem, indexOfLastItem);
 
   // The main function
   const getMerchantData = async (pincode: string) => {
     setIsLoading(true);
     let start = performance.now();
 
-    const cache = await searchCache(pincode);
+    const cache: any = await searchCache(pincode);
     if (cache) {
-      console.log("Cache found")
+      console.log("Cache found");
       setData(cache);
       let end = performance.now();
       setTimeTakenForRequest(end - start); // in ms
@@ -56,18 +50,19 @@ export function Merchants(props: MerchantsProps) {
           session: props.sessionId
         })
         .then((res) => {
-          resolve(res.data)
+          resolve(res.data);
+          console.log("res.data", res.data);
         }).catch((err) => {
           reject(null);
-        })
-      })
-      setData(getData?.current)
+        });
+      });
+      setData(getData?.current);
+      console.log('getting this data from request and set it up: ', getData);
 
-      console.log('getting this data from request and set it up: ', getData)
-
-    let end = performance.now();
-    setTimeTakenForRequest(end - start); // in ms
-    setIsLoading(false);
+      let end = performance.now();
+      setTimeTakenForRequest(end - start); // in ms
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -103,9 +98,7 @@ export function Merchants(props: MerchantsProps) {
             time={timeTakenForRequest}
           />
 
-          <div
-            className={`h-[50vh] my-4 border-b px-4 overflow-auto ${styles.sleek_scrollbar}`}
-          >
+          <div className={`h-[50vh] my-4 border-b px-4 overflow-auto ${styles.sleek_scrollbar}`}>
             {currentItems?.map((merchant, index) => (
               <MerchantCard key={index} {...merchant} />
             ))}
