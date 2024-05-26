@@ -1,7 +1,7 @@
 # Set up basic server configurations
 
 - name: Build and run Docker container
-  hosts: frontend #all
+  hosts: all
   gather_facts: true
   become: yes
   tasks:
@@ -38,14 +38,13 @@ Build frontend container
   tasks:
     - name: Generate .env file
       copy:
-        dest: "$HOME/test/user-frontend/.env"
+        dest: "$HOME/test/ui/.env"
         content: |
-          MONGOURI=mongodb://localhost:27017 
-          CENTRAL_SERVER_URL=http://localhost:3001   
+          VITE_BACKEND_URL=http://localhost:3001   
 
     - name: Build Docker image frontend
       command: ls
-      command: docker build -t frontend $HOME/test/user-frontend
+      command: docker build -t frontend $HOME/test/ui
 
     - name: Run Docker container frontend
       command: docker run -d --name=fronend_container -p 3000:3000 frontend
