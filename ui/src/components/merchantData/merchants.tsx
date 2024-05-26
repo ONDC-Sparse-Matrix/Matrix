@@ -7,7 +7,7 @@ import { useState } from "react";
 import axios from "axios";
 import { FETCH_PINCODE_DATA } from "@/lib/endpoints";
 import { PincodeData, PincodeDataCache } from "@/lib/types";
-import { testPincodeData_1, testPincodeData_2 } from "@/lib/test-data";
+import { testPincodeData_1, testPincodeData_2 } from "@/lib/test-search-data";
 import { updateCache, searchCache } from "@/lib/db";
 
 interface MerchantsProps {

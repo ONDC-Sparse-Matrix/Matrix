@@ -14,6 +14,26 @@ export const testPincodeData_1: PincodeData = {
         email: "merchanttwo@example.com",
         pin_codes: ["123456", "345678"],
       },
+      {
+        name: "Merchant One",
+        email: "merchantone@example.com",
+        pin_codes: ["123456", "234567"],
+      },
+      {
+        name: "Merchant Two",
+        email: "merchanttwo@example.com",
+        pin_codes: ["123456", "345678"],
+      },
+      {
+        name: "Merchant One",
+        email: "merchantone@example.com",
+        pin_codes: ["123456", "234567"],
+      },
+      {
+        name: "Merchant Two",
+        email: "merchanttwo@example.com",
+        pin_codes: ["123456", "345678"],
+      },
     ],
   },
   cache: [
