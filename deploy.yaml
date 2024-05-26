@@ -47,19 +47,19 @@ services:
       - my_network
   # merchant-data-db:
   #   image: mongo
-  #   ports:
-  #     - 27018:27017
+    # ports:
+    #   - 27018:27017
 
   frontend:
     # image: matrix-frontend
     build: ./ui/
     # env_file:
     #   - ./ui/.env
-    depends_on:
-      - backend-server
-      - central-server
+    # depends_on:
+    #   - backend-server
+    #   - central-server
     ports:
-      - "80:80"
+      - "5173:5173"
     networks:
       - my_network  
 
