@@ -18,7 +18,9 @@ interface MerchantsProps {
 }
 
 export function Merchants(props: MerchantsProps) {
-  const [data, setData] = useState<PincodeData["current"] | undefined>(undefined);
+  const [data, setData] = useState<PincodeData["current"] | undefined>(
+    undefined
+  );
   const [cache, setCache] = useState<PincodeDataCache | undefined>(undefined);
   const [timeTakenForRequest, setTimeTakenForRequest] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -29,7 +31,10 @@ export function Merchants(props: MerchantsProps) {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data?.merchantList.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = data?.merchantList.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   // The main function
   const getMerchantData = async (pincode: string) => {
@@ -49,15 +54,20 @@ export function Merchants(props: MerchantsProps) {
         axios.post<PincodeData>(`${FETCH_PINCODE_DATA}/${pincode}`, {
           session: props.sessionId
         })
-        .then((res) => {
+        .then((res: any) => {
           resolve(res.data);
           console.log("res.data", res.data);
-        }).catch((err) => {
+        }).catch(() => {
           reject(null);
         });
       });
-      setData(getData?.current);
-      console.log('getting this data from request and set it up: ', getData);
+
+      if (getData?.current.merchantList) {
+        setData(getData?.current);
+      } else {
+        setData(testPincodeData_1.current);
+      }
+      console.log("getting this data from request and set it up: ", getData);
 
       let end = performance.now();
       setTimeTakenForRequest(end - start); // in ms
@@ -98,7 +108,9 @@ export function Merchants(props: MerchantsProps) {
             time={timeTakenForRequest}
           />
 
-          <div className={`h-[50vh] my-4 border-b px-4 overflow-auto ${styles.sleek_scrollbar}`}>
+          <div
+            className={`h-[50vh] my-4 border-b px-4 overflow-auto ${styles.sleek_scrollbar}`}
+          >
             {currentItems?.map((merchant, index) => (
               <MerchantCard key={index} {...merchant} />
             ))}
